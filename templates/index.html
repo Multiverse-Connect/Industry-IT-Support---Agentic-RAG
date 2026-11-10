@@ -1,0 +1,790 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{{ app_name }}</title>
+
+    <link rel="stylesheet" href="/static/css/style.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #080b14;
+            --panel: #101522;
+            --panel-light: #151c2d;
+            --border: #252e42;
+            --text: #edf1fa;
+            --muted: #8490a8;
+            --accent: #a78bfa;
+            --accent-2: #7c6cf0;
+            --green: #4ade80;
+            --blue: #60a5fa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(ellipse at 45% -20%, #25204c 0%, transparent 50%),
+                var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        button, textarea, input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .shell {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr) 310px;
+            min-height: 100vh;
+            gap: 0;
+        }
+
+        /* LEFT SIDEBAR */
+
+        .sidebar {
+            background: rgba(13, 18, 31, 0.95);
+            border-right: 1px solid var(--border);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 11px;
+            border-radius: 7px;
+            background: rgba(167, 139, 250, 0.12);
+            color: #c4b5fd;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .brand-badge::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .sidebar h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 27px;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin: 22px 0 12px;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .workflow-card {
+            background: linear-gradient(145deg, #151c2e, #101522);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 18px 14px;
+            margin-top: 35px;
+        }
+
+        .workflow-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            margin: 0 0 18px;
+            color: #d9d2ff;
+        }
+
+        .flow-step {
+            position: relative;
+            padding: 11px 10px 11px 28px;
+            margin: 7px 0;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.025);
+            color: #aab4ca;
+            font-size: 12px;
+            border: 1px solid transparent;
+        }
+
+        .flow-step::before {
+            content: "";
+            position: absolute;
+            left: 11px;
+            top: 15px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .flow-step:last-child {
+            color: var(--green);
+            border-color: rgba(74, 222, 128, 0.15);
+            background: rgba(74, 222, 128, 0.04);
+        }
+
+        .flow-step:last-child::before {
+            background: var(--green);
+        }
+
+        .secondary-btn {
+            width: 100%;
+            padding: 13px;
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.35);
+            border-radius: 9px;
+            color: #c4b5fd;
+            font-weight: 700;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* MAIN WORKSPACE */
+
+        .main {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: rgba(8, 11, 20, 0.45);
+        }
+
+        .topbar {
+            height: 75px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            background: rgba(16, 21, 34, 0.65);
+        }
+
+        .topbar > div {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 12px var(--green);
+        }
+
+        .pill {
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            background: rgba(167, 139, 250, 0.1);
+            padding: 7px 12px;
+            border-radius: 20px;
+            color: #c4b5fd;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* CHAT AREA */
+
+        .chat-area {
+            flex: 1;
+            padding: 35px 8%;
+            overflow-y: auto;
+            min-height: 400px;
+        }
+
+        .message {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 25px;
+            align-items: flex-start;
+        }
+
+        .avatar {
+            min-width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa, #6554cf);
+            color: white;
+            box-shadow: 0 5px 18px rgba(124, 108, 240, 0.2);
+        }
+
+        .bubble {
+            max-width: 850px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 19px 22px;
+            border-radius: 4px 14px 14px 14px;
+            color: #dce3f2;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .bubble strong {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            color: white;
+        }
+
+        .bubble p {
+            color: #9da9bf;
+            margin-bottom: 0;
+        }
+
+        /* EXAMPLE PROMPTS */
+
+        .composer-wrap {
+            padding: 20px 8% 30px;
+            border-top: 1px solid var(--border);
+            background: rgba(16, 21, 34, 0.7);
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-bottom: 15px;
+        }
+
+        .example {
+            background: #151c2d;
+            border: 1px solid var(--border);
+            color: #aab4ca;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            transition: 0.2s;
+        }
+
+        .example:hover {
+            color: white;
+            border-color: var(--accent);
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        .composer {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 12px;
+            background: #0c1120;
+            border: 1px solid #343c56;
+            border-radius: 13px;
+            transition: 0.2s;
+        }
+
+        .composer:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.08);
+        }
+
+        .composer textarea {
+            flex: 1;
+            resize: none;
+            outline: none;
+            border: none;
+            background: transparent;
+            color: white;
+            min-width: 0;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .composer textarea::placeholder {
+            color: #68748e;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #a78bfa, #7563e8);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: 800;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(124, 108, 240, 0.3);
+        }
+
+        /* RIGHT AGENT TRACE PANEL */
+
+        .trace-panel {
+            background: #0e1320;
+            border-left: 1px solid var(--border);
+            padding: 27px 20px;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .trace-panel h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 19px;
+            margin: 0 0 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .trace-list {
+            margin-top: 25px;
+            flex: 1;
+        }
+
+        .empty {
+            padding: 25px 12px;
+            text-align: center;
+            border: 1px dashed #343c50;
+            border-radius: 10px;
+            color: #69758d;
+            font-size: 12px;
+        }
+
+        .source-box {
+            padding: 16px;
+            border-radius: 11px;
+            background: rgba(96, 165, 250, 0.06);
+            border: 1px solid rgba(96, 165, 250, 0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-top: 20px;
+        }
+
+        .source-box span {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .source-box strong {
+            font-size: 13px;
+            color: #93c5fd;
+            overflow-wrap: anywhere;
+        }
+
+        /* UPLOAD MODAL */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(3, 6, 14, 0.82);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 470px;
+            background: #131a2b;
+            border: 1px solid #343d56;
+            border-radius: 17px;
+            padding: 27px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .modal-head h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .modal-head button {
+            border: none;
+            background: #252d40;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 20px;
+        }
+
+        .modal-card input {
+            width: 100%;
+            margin-top: 14px;
+            padding: 13px;
+            background: #0a1020;
+            border: 1px solid #303a50;
+            border-radius: 9px;
+            outline: none;
+            color: white;
+            font-size: 13px;
+        }
+
+        .modal-card input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-card input[type="file"] {
+            color: #aab4ca;
+        }
+
+        .full {
+            width: 100%;
+            margin-top: 17px;
+        }
+
+        .upload-status {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #aab4ca;
+            line-height: 1.6;
+        }
+
+        /* RESPONSIVE DESIGN */
+
+        @media (max-width: 1100px) {
+            .shell {
+                grid-template-columns: 220px minmax(0, 1fr);
+            }
+
+            .trace-panel {
+                grid-column: 1 / -1;
+                border-left: none;
+                border-top: 1px solid var(--border);
+                min-height: 250px;
+            }
+
+            .trace-list {
+                min-height: 100px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .shell {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar {
+                padding: 20px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .sidebar h1 {
+                font-size: 23px;
+            }
+
+            .workflow-card {
+                margin-top: 15px;
+            }
+
+            .topbar {
+                padding: 0 17px;
+                height: 65px;
+            }
+
+            .chat-area {
+                padding: 25px 17px;
+                min-height: 350px;
+            }
+
+            .composer-wrap {
+                padding: 17px;
+            }
+
+            .examples {
+                flex-direction: column;
+            }
+
+            .example {
+                text-align: left;
+            }
+
+            .composer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .composer .send-btn {
+                width: 100%;
+            }
+
+            .trace-panel {
+                padding: 22px 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="shell">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+
+        <div>
+            <div class="brand-badge">FDE PROJECT</div>
+
+            <h1>
+                IT Support<br>
+                Agentic RAG
+            </h1>
+
+            <p class="muted">
+                Your intelligent enterprise knowledge assistant.
+                Private company knowledge first. External web only
+                when evidence is weak.
+            </p>
+
+            <!-- LANGGRAPH WORKFLOW -->
+            <div class="workflow-card">
+
+                <h3>◈ LangGraph Workflow</h3>
+
+                <div class="flow-step">1. Route question</div>
+                <div class="flow-step">2. Retrieve private KB</div>
+                <div class="flow-step">3. Grade evidence</div>
+                <div class="flow-step">4. Web fallback if weak</div>
+                <div class="flow-step">5. Rewrite & retry</div>
+                <div class="flow-step">6. Grounded answer</div>
+
+            </div>
+        </div>
+
+        <button id="openUpload" class="secondary-btn">
+            + Add Company Document
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CHAT WORKSPACE -->
+    <main class="main">
+
+        <!-- TOP NAVIGATION -->
+        <header class="topbar">
+
+            <div>
+                <span class="status-dot"></span>
+                <span>Enterprise Knowledge Copilot</span>
+            </div>
+
+            <span class="pill">AGENTIC RAG</span>
+
+        </header>
+
+
+        <!-- CHAT MESSAGES -->
+        <section id="chat" class="chat-area">
+
+            <div class="message assistant">
+
+                <div class="avatar">AI</div>
+
+                <div class="bubble">
+
+                    <strong>Welcome to your IT Knowledge Hub.</strong>
+
+                    <p>
+                        I'm your enterprise IT support assistant.
+                        I can search internal company documentation,
+                        evaluate retrieved evidence and use external
+                        sources when necessary.
+                    </p>
+
+                    <p>
+                        Ask me anything about IT support, company
+                        policies, troubleshooting or vendor guidance.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHAT INPUT -->
+        <section class="composer-wrap">
+
+            <div class="examples">
+
+                <button class="example">
+                    How do I connect to the company VPN?
+                </button>
+
+                <button class="example">
+                    What is our password reset policy?
+                </button>
+
+                <button class="example">
+                    What is the latest Microsoft Teams outage guidance?
+                </button>
+
+            </div>
+
+
+            <form id="chatForm" class="composer">
+
+                <textarea
+                    id="question"
+                    rows="2"
+                    placeholder="Ask your IT support agent anything..."
+                    required
+                ></textarea>
+
+                <button type="submit" class="send-btn">
+                    Ask Agent →
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- RIGHT AGENT TRACE PANEL -->
+    <aside class="trace-panel">
+
+        <div>
+
+            <h2>Agent Trace</h2>
+
+            <p class="muted">
+                Real-time LangGraph execution and decision monitoring.
+            </p>
+
+        </div>
+
+
+        <!-- DYNAMIC TRACE CONTENT -->
+        <div id="trace" class="trace-list">
+
+            <div class="empty">
+                <p>No request yet.</p>
+                <p>Agent execution details will appear here.</p>
+            </div>
+
+        </div>
+
+
+        <!-- FINAL SOURCE -->
+        <div class="source-box">
+
+            <span>Final Source</span>
+
+            <strong id="sourceUsed">—</strong>
+
+        </div>
+
+    </aside>
+
+</div>
+
+
+<!-- DOCUMENT UPLOAD MODAL -->
+<div id="uploadModal" class="modal hidden">
+
+    <div class="modal-card">
+
+        <div class="modal-head">
+
+            <h2>Ingest Company Document</h2>
+
+            <button id="closeUpload">×</button>
+
+        </div>
+
+
+        <p class="muted">
+            Upload company knowledge documents.
+            Files are chunked, embedded and indexed into Pinecone
+            for future retrieval.
+        </p>
+
+
+        <input
+            id="adminKey"
+            type="password"
+            placeholder="Admin API key"
+        />
+
+
+        <input
+            id="fileInput"
+            type="file"
+            accept=".pdf,.txt,.md,.docx"
+        />
+
+
+        <button id="uploadBtn" class="send-btn full">
+            Index Document →
+        </button>
+
+
+        <div id="uploadStatus" class="upload-status"></div>
+
+    </div>
+
+</div>
+
+
+<!-- EXISTING JAVASCRIPT FILE - DO NOT CHANGE PATH -->
+<script src="/static/js/app.js"></script>
+
+</body>
+</html>
